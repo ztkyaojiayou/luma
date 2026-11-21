@@ -57,7 +57,7 @@
 
 副产品:`Crafting Interpreters` 的 jlox 就是 Java 8 风格,可以逐行对照。
 
-**代价(必须承认):** 代码更啰嗦。总计约 1300 行,其中真正有逻辑的约 650 行,其余是样板。
+**代价(必须承认):** 代码更啰嗦。总计约 1380 行,其中真正有逻辑的约 700 行,其余是样板。
 加一个新 AST 节点要改 3 个地方(子类、Visitor 接口、Interpreter 实现),而不是 1 个。
 
 **Java 8 不可用的语法(实现时注意):**
@@ -90,7 +90,7 @@ lambda、Stream、Optional、try-with-resources、接口默认方法
 | 布尔 | `true`、`false` | `Boolean` |
 | 空 | `null` | `null` |
 | 数组 | `[1, 2, 3]` | `LumaArray`(包装 `List<Object>`) |
-| 函数 | 由 `fn` 定义 | `LumaFunction`;内建函数同为值 |
+| 函数 | 由 `func` 定义 | `LumaFunction`;内建函数同为值 |
 
 > **设计说明:为什么数字只有 double?**
 > 分成 int/float 会引入隐式转换(`1/2 = 0` 还是 `0.5`?),而隐式转换违反「机制可见」原则。
@@ -110,7 +110,7 @@ lambda、Stream、Optional、try-with-resources、接口默认方法
 **关键字(18 个,全小写英文)**
 
 ```
-let  fn  if  else  while  for  return  print
+let  func  if  else  while  for  return  print
 true  false  null  and  or
 ```
 
@@ -142,7 +142,7 @@ print "你好";                    // 打印(不要求括号)
 if (x > 10) { ... } else { ... }
 while (x > 0) { ... }
 for (let i = 0; i < 3; i = i + 1) { ... }
-fn add(a, b) { return a + b; }  // 函数定义
+func add(a, b) { return a + b; }  // 函数定义
 return x;                       // 只能在函数内
 { let y = 1; }                  // 块,引入新作用域
 ```
@@ -175,7 +175,7 @@ a.length           // 长度,属性访问只支持 length 这一个名字
 
 ### 5.4 分号
 
-**必须。** 表达式语句、`let`、`return`、赋值都要分号结尾;块语句 `{ }` 和 `fn` 定义不需要。
+**必须。** 表达式语句、`let`、`return`、赋值都要分号结尾;块语句 `{ }` 和 `func` 定义不需要。
 
 > 理由:强制分号让「语句边界」显式,解析器不必猜。教学语言不该在 ASI 这种坑上浪费注意力。
 
@@ -218,9 +218,9 @@ print x;            // 1
 函数是一等公民,可以赋值、传参、返回。函数在**定义时**捕获所在环境——这就是闭包。
 
 ```luma
-fn makeCounter() {
+func makeCounter() {
     let count = 0;
-    fn next() {
+    func next() {
         count = count + 1;
         return count;
     }
@@ -281,7 +281,7 @@ let b = a;          // b 和 a 是同一个数组,不是两个
 b[0] = 99;
 print a[0];         // 99  ← a 也变了
 
-fn modify(x) { x[0] = 0; }
+func modify(x) { x[0] = 0; }
 modify(a);
 print a[0];         // 0
 ```
@@ -418,7 +418,7 @@ public interface LumaCallable {
 
 **① 递归 —— 阶乘** `examples/factorial.luma`
 ```luma
-fn fact(n) {
+func fact(n) {
     if (n <= 1) { return 1; }
     return n * fact(n - 1);
 }
@@ -427,9 +427,9 @@ print fact(10);   // 3628800
 
 **② 闭包 —— 独立计数器** `examples/counter.luma`
 ```luma
-fn makeCounter() {
+func makeCounter() {
     let n = 0;
-    fn next() { n = n + 1; return n; }
+    func next() { n = n + 1; return n; }
     return next;
 }
 let a = makeCounter();
@@ -441,7 +441,7 @@ print b();   // 1  ← 证明环境是各自捕获的
 
 **③ 循环 —— 斐波那契** `examples/fib.luma`
 ```luma
-fn fib(n) {
+func fib(n) {
     let a = 0;
     let b = 1;
     for (let i = 0; i < n; i = i + 1) {
@@ -456,7 +456,7 @@ print fib(20);   // 6765
 
 **④ 数组 —— 冒泡排序(原地修改)** `examples/sort.luma`
 ```luma
-fn sort(a) {
+func sort(a) {
     let n = a.length;
     for (let i = 0; i < n; i = i + 1) {
         for (let j = 0; j < n - i - 1; j = j + 1) {
@@ -478,7 +478,7 @@ print data;             // [1, 2, 5, 8]
 
 **⑤ 数组增长 —— 收集质数** `examples/primes.luma`
 ```luma
-fn isPrime(n) {
+func isPrime(n) {
     if (n < 2) { return false; }
     let d = 2;
     while (d * d <= n) {
@@ -590,7 +590,7 @@ Java 21 的 `sealed` 能让编译器提醒你漏了哪处,Java 8 不会——这
 | `Block` | `{ ... }` |
 | `If` | `if (c) s else s` |
 | `While` | `while (c) s` |
-| `Function` | `fn name(a, b) { ... }` |
+| `Function` | `func name(a, b) { ... }` |
 | `Return` | `return expr;` |
 
 > `for` 不进 AST —— 它在解析时直接展开成 `Block { Var; While { ...; Sequence } }`。
