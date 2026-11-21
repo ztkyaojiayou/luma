@@ -77,7 +77,12 @@ examples/            五段验收程序
 
 ## 想自己造一门语言?从这里开始
 
-**[`demo/Calc.java`](demo/Calc.java)** —— 107 行纯代码的计算器,支持 `+ - * /` 和括号。
+**[`demo/Calc.java`](demo/Calc.java)** —— 用 **Java** 写的 107 行计算器,支持 `+ - * /` 和括号。
+
+> **注意:它是 Java,不是 Luma。**
+> 这是在**造**一门语言,不是在**用**一门语言——造语言必须用一个已经存在的语言当宿主。
+> Luma 自己也做不到:它没有字符串下标,连"看第一个字符"都不可能,
+> 所以没法扫描 `"1 + 2 * 3"` 这样的输入。
 
 ```bash
 javac -encoding UTF-8 -d demo-out demo/Calc.java

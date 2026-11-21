@@ -188,6 +188,11 @@ final class InterpreterTest {
         expectError("对非数组取下标", "print 1[0];", "不能用下标访问");
         expectError("访问其他属性", "print [].foo;", "只支持 .length");
         expectError("push 非数组", "push(1, 2);", "必须是数组");
+
+        // 这两条是「已知限制」,不是想要的行为。
+        // 如果哪天有人实现了字符串下标,这两条会失败 —— 那时候记得同步改 SPEC §八 和手册。
+        expectError("字符串不能取下标", "print \"abc\"[0];", "不能用下标访问");
+        expectError("字符串没有 length", "print \"abc\".length;", "没有 .length");
     }
 
     private static void errors() {
