@@ -1,0 +1,17 @@
+// 验收 ④:数组 + 引用语义 —— sort 不返回值,却改变了调用者的数组
+func sort(a) {
+    let n = a.length;
+    for (let i = 0; i < n; i = i + 1) {
+        for (let j = 0; j < n - i - 1; j = j + 1) {
+            if (a[j] > a[j + 1]) {
+                let t = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = t;
+            }
+        }
+    }
+}
+
+let data = [5, 2, 8, 1];
+sort(data);
+print data;

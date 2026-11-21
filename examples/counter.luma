@@ -1,0 +1,16 @@
+// 验收 ②:闭包 —— 两个计数器各自独立,证明环境是按定义处捕获的
+func makeCounter() {
+    let n = 0;
+    func next() {
+        n = n + 1;
+        return n;
+    }
+    return next;
+}
+
+let a = makeCounter();
+let b = makeCounter();
+
+print a();
+print a();
+print b();      // 若环境被共享,这里会是 3

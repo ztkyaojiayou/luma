@@ -11,7 +11,7 @@
 
 | 问题 | 答案 |
 |---|---|
-| **这是什么** | 一门小语言 + 一个解释器,约 1400 行 Java 8 |
+| **这是什么** | 一门小语言 + 一个解释器,约 2400 行 Java 8(含注释) |
 | **能干什么** | 排序、质数筛选、递归、闭包、动态数组 —— **图灵完备** |
 | **不能干什么** | 读写文件、处理字符串、类与对象 |
 | **在 Java 技术栈里是什么角色** | **≈ JVM**(负责执行),**不是 JDK**(没有编译器、没有标准库) |
@@ -57,7 +57,7 @@
 
 副产品:`Crafting Interpreters` 的 jlox 就是 Java 8 风格,可以逐行对照。
 
-**代价(必须承认):** 代码更啰嗦。总计约 1380 行,其中真正有逻辑的约 700 行,其余是样板。
+**代价(必须承认):** 代码更啰嗦。实测总计 **2437 行**,其中非注释的代码约 1580 行,其余是样板和注释。
 加一个新 AST 节点要改 3 个地方(子类、Visitor 接口、Interpreter 实现),而不是 1 个。
 
 **Java 8 不可用的语法(实现时注意):**
@@ -350,6 +350,7 @@ public interface LumaCallable {
 ### 6.8 运行时行为
 
 - 函数递归深度上限:1000 层(超出报「递归过深」,而不是让 JVM 栈溢出崩溃)
+  - **注意**:这个上限只在 `-Xss8m` 下才真正可达,默认 JVM 栈约 700 层就会先溢出。见 §10.5
 - 表达式求值顺序:严格从左到右
 - 数组字面量求值:按书写顺序求值每个元素
 
@@ -529,7 +530,7 @@ luma/
   examples/                    五段验收程序
 ```
 
-合计约 **1380 行**,其中用户逻辑约 700 行,其余是 Java 8 的样板。
+合计约 **2400 行**(实测 2437),其中非注释的代码约 1580 行,其余是 Java 8 的样板与注释。
 
 ### 10.1 AST 的写法(Visitor 模式)
 
@@ -619,6 +620,15 @@ Java 21 的 `sealed` 能让编译器提醒你漏了哪处,Java 8 不会——这
 
 ### 10.5 构建与运行(用 JDK 8)
 
+最简单的方式是用仓库里的 `run.sh`,它把下面两件事都替你做了:
+
+```bash
+./run.sh                        # 进入 REPL
+./run.sh examples/fib.luma      # 执行脚本
+```
+
+手动编译运行:
+
 ```bash
 JAVA8=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home
 
@@ -626,12 +636,18 @@ JAVA8=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home
 $JAVA8/bin/javac -encoding UTF-8 -d out \
     $(find src/main/java -name '*.java')
 
-# 运行脚本
-$JAVA8/bin/java -cp out luma.Luma examples/factorial.luma
-
-# REPL
-$JAVA8/bin/java -cp out luma.Luma
+# 运行(注意 -Xss8m,原因见下)
+$JAVA8/bin/java -Xss8m -cp out luma.Luma examples/factorial.luma
 ```
+
+**关于 `-Xss8m`(实测结论)**
+
+每层 Luma 函数调用大约消耗 6 个 Java 栈帧。实测 JVM 默认栈只够 **700 层左右**,
+再深就抛 `StackOverflowError`——那意味着 §6.8 规定的 1000 层上限根本轮不到生效。
+加到 8m 后,999 层合法递归正常,第 1000 层会被"调用层数过深"友好拦住。
+
+代码里还留了一道兜底:即使不带 `-Xss8m` 运行,`StackOverflowError` 也会被
+{@code Luma.run} 转成同一格式的中文报错,而不是把 JVM 的堆栈打给人看。
 
 `pom.xml` 里的 `source`/`target` 固定为 `1.8`,IDEA 打开时会按 Java 8 编译。
 
@@ -661,7 +677,7 @@ new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)
 | 版本 | 内容 | 状态 |
 |---|---|---|
 | v0.4 | 当前规范:六种值、函数闭包、数组 + `push`、完整错误报告、Java 8 约束 | ✅ 设计完成 |
-| v1.0 | Java 8 实现 + 四段验收程序跑通 | ⬜ 待实现 |
+| v1.0 | Java 8 实现 + 五段验收程序跑通 | ✅ 已完成 |
 | 之后 | 类与对象 / 字符串下标 / 静态类型检查 | 视兴趣 |
 
 **语言名: Luma**(文件后缀 `.luma`)

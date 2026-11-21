@@ -1,0 +1,13 @@
+// 验收 ③:循环 —— for 是语法糖,最终被改写成 while
+func fib(n) {
+    let a = 0;
+    let b = 1;
+    for (let i = 0; i < n; i = i + 1) {
+        let t = a + b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+print fib(20);

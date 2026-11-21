@@ -1,0 +1,7 @@
+// 验收 ①:递归 —— 函数体内调用自己
+func fact(n) {
+    if (n <= 1) { return 1; }
+    return n * fact(n - 1);
+}
+
+print fact(10);

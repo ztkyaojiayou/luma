@@ -1,0 +1,20 @@
+// 验收 ⑤:数组增长 —— 长度在运行时才确定
+func isPrime(n) {
+    if (n < 2) { return false; }
+    let d = 2;
+    while (d * d <= n) {
+        if (n % d == 0) { return false; }
+        d = d + 1;
+    }
+    return true;
+}
+
+let primes = [];
+let i = 2;
+while (i <= 50) {
+    if (isPrime(i)) { push(primes, i); }
+    i = i + 1;
+}
+
+print primes;
+print primes.length;
