@@ -170,13 +170,39 @@ public class Luma {
      */
     static void syntaxError(int line, int column, String message) {
         hadError = true;
-        System.err.println("[第 " + line + " 行] 语法错误: " + message);
 
-        if (line >= 1 && line <= sourceLines.size()) {
-            String text = sourceLines.get(line - 1);
-            System.err.println("    " + text);
-            System.err.println("    " + caretFor(text, column));
+        int displayLine = line;
+        String text = lineText(line);
+        int displayColumn = column;
+
+        // 错误落在文件末尾的空行时(最典型:最后一行忘了分号),
+        // 回退到最后一条有内容的行,否则用户只会看到一行空白和一个孤零零的插入符。
+        // 这种情况下插入符放到行尾,因为"缺东西"的地方就在那儿。
+        if (text == null || text.trim().isEmpty()) {
+            for (int i = Math.min(line, sourceLines.size()) - 1; i >= 0; i--) {
+                if (!sourceLines.get(i).trim().isEmpty()) {
+                    displayLine = i + 1;
+                    text = sourceLines.get(i);
+                    displayColumn = text.length() + 1;
+                    break;
+                }
+            }
         }
+
+        System.err.println("[第 " + displayLine + " 行] 语法错误: " + message);
+
+        if (text != null) {
+            System.err.println("    " + text);
+            System.err.println("    " + caretFor(text, displayColumn));
+        }
+    }
+
+    /** 取第 line 行的原文(行号从 1 开始)。越界返回 null。 */
+    private static String lineText(int line) {
+        if (line >= 1 && line <= sourceLines.size()) {
+            return sourceLines.get(line - 1);
+        }
+        return null;
     }
 
     /**

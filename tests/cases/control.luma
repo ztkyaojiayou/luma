@@ -1,0 +1,5 @@
+let i = 0;
+while (i < 3) { print i; i = i + 1; }
+for (let j = 10; j > 7; j = j - 1) { print j; }
+if (0) { print "0 是真"; }
+if (null) { print "不该出现"; }

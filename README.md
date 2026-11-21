@@ -39,7 +39,7 @@ print b();   // 1  ← 两个独立的闭包
 |---|---|
 | 类型 | 动态类型,运行期检查 |
 | 值 | 数字(double)、文本、布尔、null、数组、函数 |
-| 关键字 | 16 个:`let func if else while for return print true false null` |
+| 关键字 | 11 个:`let func if else while for return print true false null` |
 | 控制流 | `if` / `while` / `for`(语法糖) |
 | 函数 | 一等公民,闭包,递归 |
 | 数组 | `[1, 2, 3]`、`a[i]`、`a.length`、`push(a, x)`,**引用语义** |
@@ -74,6 +74,25 @@ src/main/java/luma/
   Luma.java          main + REPL + 错误报告
 examples/            五段验收程序
 ```
+
+## 测试
+
+```bash
+./test.sh          # 全部:单元测试 + 端到端
+./test.sh --unit   # 只跑单元测试(约 50ms)
+```
+
+**两层测试:**
+
+| 层 | 测什么 | 位置 |
+|---|---|---|
+| **单元测试** | Scanner / Parser / Environment / Interpreter 各自的行为,191 项断言 | `src/test/java/luma/` |
+| **端到端测试** | 用真正的 `./run.sh` 跑 `.luma` 文件,比对输出和退出码 | `tests/cases/` + `tests/expected/` |
+
+零第三方依赖——测试框架本身只有 60 行(`Assert.java`),因为项目不想为了跑测试拉一个 JUnit jar 进来。
+
+> 单元测试里有一条特别值得看:`ScannerTest` 用反射读关键字表的大小,断言它等于 11。
+> 这个数字是文档里承诺过的,加一个测试就再也不会出现"文档说 16、代码里 11"这种事。
 
 ## 验收
 

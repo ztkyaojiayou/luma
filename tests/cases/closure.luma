@@ -1,0 +1,10 @@
+func makeCounter() {
+    let n = 0;
+    func next() { n = n + 1; return n; }
+    return next;
+}
+let a = makeCounter();
+let b = makeCounter();
+print a();
+print a();
+print b();

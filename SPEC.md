@@ -107,7 +107,7 @@ lambda、Stream、Optional、try-with-resources、接口默认方法
 字符串    "任意字符,支持转义"
 ```
 
-**关键字(16 个,全小写英文)**
+**关键字(11 个,全小写英文)**
 
 ```
 let  func  if  else  while  for  return  print
@@ -527,6 +527,18 @@ luma/
     NativeFunctions.java       内建 clock / push                 ~40 行
     RuntimeError.java          带行号 + 调用栈的运行时错误          ~25 行
     Luma.java                  main + REPL + 错误报告             ~120 行
+  src/test/java/luma/
+    Assert.java                零依赖断言工具                     ~60 行
+    LumaHarness.java           在测试里驱动三站并捕获输出          ~90 行
+    ScannerTest.java           词法:关键字/数字/字符串/行列号       ~120 行
+    ParserTest.java            语法:用 S 表达式断言树的形状        ~180 行
+    EnvironmentTest.java       作用域链                            ~90 行
+    InterpreterTest.java       语义:190 项断言                    ~230 行
+    TestMain.java              测试入口                            ~25 行
+  tests/
+    cases/                     端到端用例(.luma)
+    expected/                  期望输出与退出码
+    run-golden.sh              端到端运行脚本
   examples/                    五段验收程序
 ```
 

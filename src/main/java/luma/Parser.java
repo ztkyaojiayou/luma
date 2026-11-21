@@ -525,26 +525,41 @@ public class Parser {
      * <p>判据很土但有效:遇到分号(上一条语句结束了),或者遇到 let/func/if/while
      * 这类只会出现在语句开头关键字。这样一处语法错误只毁掉一条语句,
      * 不会把后面的代码也带崩。
+     *
+     * <p><b>注意开头的那个提前返回。</b>如果报错时游标正好停在一条语句的开头
+     * (典型场景:上一行忘了分号),这里绝不能先 advance 把它吃掉——
+     * 否则"下一条完好的语句"会被连带跳过,和恢复的目的正好相反。
      */
     private void synchronize() {
+        if (!isAtEnd() && isStatementStart(peek().type)) {
+            return;
+        }
+
         advance();
         while (!isAtEnd()) {
             if (previous().type == TokenType.SEMICOLON) {
                 return;
             }
-            switch (peek().type) {
-                case FUNC:
-                case LET:
-                case FOR:
-                case IF:
-                case WHILE:
-                case PRINT:
-                case RETURN:
-                    return;
-                default:
-                    advance();
-                    break;
+            if (isStatementStart(peek().type)) {
+                return;
             }
+            advance();
+        }
+    }
+
+    /** 这个 token 类型是否只可能出现在一条新语句的开头。 */
+    private static boolean isStatementStart(TokenType type) {
+        switch (type) {
+            case FUNC:
+            case LET:
+            case FOR:
+            case IF:
+            case WHILE:
+            case PRINT:
+            case RETURN:
+                return true;
+            default:
+                return false;
         }
     }
 }

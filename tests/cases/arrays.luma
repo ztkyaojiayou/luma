@@ -1,0 +1,7 @@
+let a = [5, 2, 8, 1];
+a[0] = 9;
+print a;
+print a.length;
+push(a, 0);
+print a;
+print [1, 2] == [1, 2];
