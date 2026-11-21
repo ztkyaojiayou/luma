@@ -9,3 +9,4 @@ out-test/
 
 # macOS
 .DS_Store
+demo-out/

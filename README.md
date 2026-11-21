@@ -75,6 +75,22 @@ src/main/java/luma/
 examples/            五段验收程序
 ```
 
+## 想自己造一门语言?从这里开始
+
+**[`demo/Calc.java`](demo/Calc.java)** —— 107 行纯代码的计算器,支持 `+ - * /` 和括号。
+
+```bash
+javac -encoding UTF-8 -d demo-out demo/Calc.java
+java -cp demo-out Calc "1 + 2 * (3 - 1)"      # 5
+```
+
+它是[学习手册](MANUAL.md)结语里那个「第一晚」的练习,也是**最小可行的起点**。
+
+关键差别:它**不建语法树**,边解析边求值——这是能压到一百行的原因。
+Luma 之所以要建树,是因为类型检查、优化、错误恢复都需要先有个完整结构。
+
+**从这个计算器往上加变量、加 `if`、加函数,就长成 Luma 了。**
+
 ## 测试
 
 ```bash
